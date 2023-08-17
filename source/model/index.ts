@@ -1,43 +1,31 @@
-import { DataSource } from 'typeorm';
-import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions';
 import { ConnectionOptions, parse } from 'pg-connection-string';
+import { DataSource } from 'typeorm';
 
 import { User } from './User';
+import { EnvMap } from '../config/deta';
 
 export * from './Base';
 export * from './User';
 
-const { NODE_ENV, DATABASE_URL } = process.env;
+const DATABASE_URL = EnvMap.get('DATABASE_URL');
 
-export const isProduct = NODE_ENV === 'production';
-
-const { host, port, user, password, database } = isProduct
+const { host, port, user, password, database } = DATABASE_URL
     ? parse(DATABASE_URL)
     : ({} as ConnectionOptions);
 
-const commonOptions: Pick<
-    SqliteConnectionOptions,
-    'synchronize' | 'entities' | 'migrations'
-> = {
+const commonOptions = {
     synchronize: true,
     entities: [User],
-    migrations: [`${isProduct ? '.data' : 'migration'}/*.ts`]
+    migrations: [`.data/*.ts`]
 };
 
-export default isProduct
-    ? new DataSource({
-          type: 'postgres',
-          host,
-          port: +port,
-          username: user,
-          password,
-          database,
-          logging: true,
-          ...commonOptions
-      })
-    : new DataSource({
-          type: 'sqlite',
-          database: '.data/test.db',
-          logging: false,
-          ...commonOptions
-      });
+export default new DataSource({
+    type: 'postgres',
+    host,
+    port: +port,
+    username: user,
+    password,
+    database,
+    logging: true,
+    ...commonOptions
+});

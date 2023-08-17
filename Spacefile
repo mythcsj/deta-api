@@ -1,0 +1,12 @@
+# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
+v: 0
+micros:
+  - name: build
+    src: ./
+    engine: nodejs16
+    primary: true
+    commands:
+      - pnpm install
+      - pnpm build
+    run: node ./dist/
+    dev: ts-node-dev source/
