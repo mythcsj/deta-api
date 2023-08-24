@@ -36,8 +36,9 @@ export class EnvMap {
 export async function getEnv(key: string) {
     const deta = Deta();
     const db = deta.Base('data');
-    let value = await db.get(key);
-    if (!value) {
+    const res = await db.get(key);
+    let value = '';
+    if (!res) {
         value = await getRemoteEnv(key);
         if (value) {
             await db.put({ value }, key);
@@ -50,5 +51,5 @@ async function getRemoteEnv(constKey: string) {
     const { data } = await axios(
         `${AUTH_CENTER_API}/api/env?constKey=${constKey}`
     );
-    return data;
+    return data['data'];
 }
