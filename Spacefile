@@ -9,4 +9,3 @@ micros:
       - pnpm install
       - pnpm build
     run: node ./dist/
-    dev: ts-node-dev source/
